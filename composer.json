@@ -4,9 +4,7 @@
     "license": "MIT",
     "description": "Difference Finder",
     "autoload": {
-        "psr-4": {
-            "Axfz123\\DifferenceFinder\\": "src/"
-        }
+
     },
     "authors": [
         {
