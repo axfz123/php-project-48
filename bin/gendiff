@@ -10,6 +10,8 @@ if (file_exists($autoloadPath1)) {
     require_once $autoloadPath2;
 }
 
+use function GenDiff\JsonParser\parseJson;
+
 $doc = <<<DOC
 Generate diff
 
@@ -28,4 +30,7 @@ $handler = new \Docopt\Handler(array(
     'help' => true,
     'optionsFirst' => false,
 ));
-$args = $handler->handle($doc, $argv);
+$args = $handler->handle($doc);
+
+print_r(parseJson($args->args["<firstFile>"]));
+print_r(parseJson($args->args["<secondFile>"]));

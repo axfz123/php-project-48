@@ -4,7 +4,9 @@
     "license": "MIT",
     "description": "Difference Finder",
     "autoload": {
-
+        "files": [
+            "src/jsonParser.php"
+        ]
     },
     "authors": [
         {
