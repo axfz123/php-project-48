@@ -1,0 +1,24 @@
+{
+    "name": "axfz123/difference_finder",
+    "type": "project",
+    "license": "MIT",
+    "description": "Difference Finder",
+    "autoload": {
+        "psr-4": {
+            "Axfz123\\DifferenceFinder\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Alexey Zhabin",
+            "email": "axfz@ya.ru"
+        }
+    ],
+    "require": {
+        "docopt/docopt": "^1.0"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^3.11",
+        "phpstan/phpstan": "^2.1"
+    }
+}
