@@ -5,7 +5,8 @@
     "description": "Difference Finder",
     "autoload": {
         "files": [
-            "src/jsonParser.php"
+            "src/jsonParser.php",
+            "src/differ.php"
         ]
     },
     "authors": [

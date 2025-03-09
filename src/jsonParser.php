@@ -1,6 +1,6 @@
 <?php
 
-namespace GenDiff\JsonParser;
+namespace Differ\JsonParser;
 
 function parseJson(string $file): array
 {
