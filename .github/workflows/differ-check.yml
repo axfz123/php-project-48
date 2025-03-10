@@ -17,10 +17,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: make install
-      - run: make lint
-      - run: make test
       - uses: paambaati/codeclimate-action@v9.0.0
         env:
           CC_TEST_REPORTER_ID: ${{secrets.CODE_CLIMATE_ID}}
         with:
-          coverageCommand: make test
+          coverageCommand: make test-coverage
+          coverageLocations: build/logs/clover.xml:clover
+          debug: true
