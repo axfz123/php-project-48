@@ -5,8 +5,8 @@
     "description": "Difference Finder",
     "autoload": {
         "files": [
-            "src/jsonParser.php",
-            "src/differ.php"
+            "src/JsonParser.php",
+            "src/Differ.php"
         ]
     },
     "authors": [
@@ -20,6 +20,7 @@
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^3.11",
-        "phpstan/phpstan": "^2.1"
+        "phpstan/phpstan": "^2.1",
+        "phpunit/phpunit": "^12.0"
     }
 }
