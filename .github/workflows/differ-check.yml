@@ -1,22 +1,13 @@
 name: differ-check
 on: push
 jobs:
-  test:
-    name: test
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - run: make install
       - run: make lint
       - run: make test
-
-  coverage:
-    needs: [ test ]
-    name: coverage
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: make install
       - uses: paambaati/codeclimate-action@v9.0.0
         env:
           CC_TEST_REPORTER_ID: ${{secrets.CODE_CLIMATE_ID}}
