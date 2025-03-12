@@ -19,3 +19,6 @@ test-coverage:
 
 test-coverage-text:
 	XDEBUG_MODE=coverage composer exec --verbose phpunit tests -- --coverage-text
+
+test-coverage-html:
+	XDEBUG_MODE=coverage composer exec --verbose phpunit tests -- --coverage-html build/coverage

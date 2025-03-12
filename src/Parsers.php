@@ -3,7 +3,6 @@
 namespace Differ\Parsers;
 
 use Symfony\Component\Yaml\Yaml;
-use Symfony\Component\Yaml\Exception\ParseException;
 
 function parseContent(string $content, string $ext): array
 {
@@ -21,10 +20,5 @@ function parseJson(string $jsonString): array
 
 function parseYaml(string $yamlString): array
 {
-    try {
-        return Yaml::parse($yamlString) ?? [];
-    } catch (ParseException $exception) {
-        printf("Unable to parse the YAML string: %s", $exception->getMessage());
-        return [];
-    }
+    return Yaml::parse($yamlString) ?? [];
 }
