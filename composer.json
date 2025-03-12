@@ -5,7 +5,7 @@
     "description": "Difference Finder",
     "autoload": {
         "files": [
-            "src/JsonParser.php",
+            "src/Parsers.php",
             "src/Differ.php"
         ]
     },
@@ -16,7 +16,8 @@
         }
     ],
     "require": {
-        "docopt/docopt": "^1.0"
+        "docopt/docopt": "^1.0",
+        "symfony/yaml": "^7.2"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^3.11",

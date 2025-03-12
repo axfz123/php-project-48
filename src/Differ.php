@@ -2,41 +2,48 @@
 
 namespace Differ\Differ;
 
-use function Differ\JsonParser\parseJson;
+use function Differ\Parsers\parseContent;
 
 function genDiff(string $filePath1, string $filePath2): string
 {
-    if (! file_exists($filePath1)) {
-        throw new \Exception("File \"{$filePath1}\" not found");
-    }
-    if (! file_exists($filePath2)) {
-        throw new \Exception("File \"{$filePath2}\" not found");
-    }
+    $realPath1 = realpath($filePath1);
+    $realPath2 = realpath($filePath2);
 
-    $result = "{" . PHP_EOL;
+    $ext1 = pathinfo($realPath1, PATHINFO_EXTENSION);
+    $ext2 = pathinfo($realPath2, PATHINFO_EXTENSION);
 
-    $jsonContent1 = parseJson($filePath1);
-    $jsonContent2 = parseJson($filePath2);
+    $fileArray1 = parseContent(getFileContents($realPath1), $ext1);
+    $fileArray2 = parseContent(getFileContents($realPath2), $ext2);
+
+    $result = "{\n";
 
     $allKeys = array_unique(
         array_merge(
-            array_keys($jsonContent1),
-            array_keys($jsonContent2)
+            array_keys($fileArray1),
+            array_keys($fileArray2)
         )
     );
 
     foreach ($allKeys as $key) {
-        $value1 = array_key_exists($key, $jsonContent1) ? $jsonContent1[$key] : null;
-        $value2 = array_key_exists($key, $jsonContent2) ? $jsonContent2[$key] : null;
+        $value1 = array_key_exists($key, $fileArray1) ? $fileArray1[$key] : null;
+        $value2 = array_key_exists($key, $fileArray2) ? $fileArray2[$key] : null;
         if ($value1 === $value2) {
-            $result .= "    {$key}: {$value1}" . PHP_EOL;
+            $result .= "    {$key}: {$value1}\n";
         } else {
-            $result .= isset($value1) ? "  - {$key}: {$value1}" . PHP_EOL : "";
-            $result .= isset($value2) ? "  + {$key}: {$value2}" . PHP_EOL : "";
+            $result .= isset($value1) ? "  - {$key}: {$value1}\n" : "";
+            $result .= isset($value2) ? "  + {$key}: {$value2}\n" : "";
         }
     }
 
-    $result .= "}" . PHP_EOL;
+    $result .= "}\n";
 
     return $result;
+}
+
+function getFileContents($filePath)
+{
+    if (! file_exists($filePath)) {
+        throw new \Exception("File \"{$filePath}\" not found");
+    }
+    return file_get_contents($filePath);
 }
