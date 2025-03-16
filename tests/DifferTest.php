@@ -6,7 +6,6 @@ use PHPUnit\Framework\TestCase;
 
 use function Differ\Differ\genDiff;
 use function Differ\Differ\getFileContents;
-use function Differ\Parsers\parseYaml;
 
 class DifferTest extends TestCase
 {
