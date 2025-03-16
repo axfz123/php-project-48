@@ -2,7 +2,7 @@
 
 namespace Differ\Formatters;
 
-function stylish($tree, $depth = 1)
+function stylish(array $tree, int $depth = 1): string
 {
     $indent = str_repeat(' ', $depth * 4 - 2);
     $result = array_map(function ($node) use ($depth, $indent) {
@@ -16,7 +16,7 @@ function stylish($tree, $depth = 1)
     return "{\n" . implode("\n", $result);
 }
 
-function arrayToString($array, $depth)
+function arrayToString(array $array, int $depth): string
 {
     $indent = str_repeat(' ', $depth * 4);
     $result = array_map(function ($key, $value) use ($depth, $indent) {
@@ -27,7 +27,7 @@ function arrayToString($array, $depth)
     return "{\n" . implode("\n", $result);
 }
 
-function toString($value)
+function toString(mixed $value): string
 {
     $value = $value === null ? 'null' : $value;
     return trim(var_export($value, true), "'");
