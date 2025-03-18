@@ -32,4 +32,6 @@ $handler = new \Docopt\Handler(array(
 ));
 $args = $handler->handle($doc);
 
-echo genDiff($args->args["<firstFile>"], $args->args["<secondFile>"]);
+$formatName = $args->args["--format"] ?? "stylish";
+
+echo genDiff($args->args["<firstFile>"], $args->args["<secondFile>"], $formatName);

@@ -15,12 +15,28 @@ class DifferTest extends TestCase
         $expected = getFileContents('tests/fixtures/expected-json.txt');
         $this->assertEquals($expected, $genDiffResult);
     }
+
+    public function testDifferJsonPlain(): void
+    {
+        $genDiffResult = genDiff('tests/fixtures/file1.json', 'tests/fixtures/file2.json', 'plain');
+        $expected = getFileContents('tests/fixtures/plain.txt');
+        $this->assertEquals($expected, $genDiffResult);
+    }
+
     public function testDifferYaml(): void
     {
         $genDiffResult = genDiff('tests/fixtures/file1.yml', 'tests/fixtures/file2.yaml');
         $expected = getFileContents('tests/fixtures/expected-yaml.txt');
         $this->assertEquals($expected, $genDiffResult);
     }
+
+    public function testDifferYamlPlain(): void
+    {
+        $genDiffResult = genDiff('tests/fixtures/file1.yml', 'tests/fixtures/file2.yaml', 'plain');
+        $expected = getFileContents('tests/fixtures/plain.txt');
+        $this->assertEquals($expected, $genDiffResult);
+    }
+
     public function testGetNonExistentFile(): void
     {
         $this->expectException(\Exception::class);
