@@ -27,4 +27,8 @@ Options:
 
 ## Demo
 
-* [**gendiff**](https://asciinema.org/a/VlaE7RdaItEp3OAdbUnsNazBi)
+* https://asciinema.org/a/VlaE7RdaItEp3OAdbUnsNazBi
+* https://asciinema.org/a/QDJHxUH1TigJWHtVwOttv4cKU
+* https://asciinema.org/a/2t3iZgjrVhQECL79QyhMr03T4
+* https://asciinema.org/a/tUz8ei5T31XH9e8PXyMQyyhfC
+* https://asciinema.org/a/wpsEOfl5qS9h5p7VWnVVMxQqz

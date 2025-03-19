@@ -13,47 +13,47 @@ function genDiff(string $filePath1, string $filePath2, string $formatName = "sty
     $ext1 = pathinfo($realPath1, PATHINFO_EXTENSION);
     $ext2 = pathinfo($realPath2, PATHINFO_EXTENSION);
 
-    $fileArray1 = parseContent(getFileContents($realPath1), $ext1);
-    $fileArray2 = parseContent(getFileContents($realPath2), $ext2);
+    $tree1 = parseContent(getFileContents($realPath1), $ext1);
+    $tree2 = parseContent(getFileContents($realPath2), $ext2);
 
-    $compareArrays = function ($fileArray1, $fileArray2) use (&$compareArrays) {
-        $result = [];
-        $allKeys = array_unique(
-            array_merge(
-                array_keys($fileArray1),
-                array_keys($fileArray2)
-            )
-        );
-        sort($allKeys);
-
-        foreach ($allKeys as $key) {
-            $key1Exists = array_key_exists($key, $fileArray1);
-            $key2Exists = array_key_exists($key, $fileArray2);
-
-            $value1 = $key1Exists ? $fileArray1[$key] : null;
-            $value2 = $key2Exists ? $fileArray2[$key] : null;
-
-            $result[$key] = [];
-            if ($value1 === $value2 && $key1Exists && $key2Exists) {
-                $result[$key]['value'] = $value1;
-            } else {
-                if (is_array($value1) && is_array($value2)) {
-                    $result[$key]['children'] = $compareArrays($value1, $value2);
-                } else {
-                    $key1Exists ? $result[$key]['value-'] = $value1 : null;
-                    $key2Exists ? $result[$key]['value+'] = $value2 : null;
-                }
-            }
-        }
-        return $result;
-    };
-
-    $diff = $compareArrays($fileArray1, $fileArray2);
+    $diff = compareArrays($tree1, $tree2);
 
     return formatDiff($diff, $formatName);
 }
 
-function getFileContents($filePath)
+function compareArrays($array1, $array2)
+{
+    $allKeys = array_unique(
+        array_merge(
+            array_keys($array1),
+            array_keys($array2)
+        )
+    );
+    sort($allKeys);
+
+    return array_reduce($allKeys, function ($acc, $key) use ($array1, $array2) {
+        $key1Exists = array_key_exists($key, $array1);
+        $key2Exists = array_key_exists($key, $array2);
+
+        $value1 = $key1Exists ? $array1[$key] : null;
+        $value2 = $key2Exists ? $array2[$key] : null;
+
+        $acc[$key] = [];
+        if ($value1 === $value2 && $key1Exists && $key2Exists) {
+            $acc[$key]['value'] = $value1;
+        } else {
+            if (is_array($value1) && is_array($value2)) {
+                $acc[$key]['children'] = compareArrays($value1, $value2);
+            } else {
+                $key1Exists ? $acc[$key]['value-'] = $value1 : null;
+                $key2Exists ? $acc[$key]['value+'] = $value2 : null;
+            }
+        }
+        return $acc;
+    }, []);
+}
+
+function getFileContents($filePath): string
 {
     if (!file_exists($filePath)) {
         throw new \Exception("File \"{$filePath}\" not found");

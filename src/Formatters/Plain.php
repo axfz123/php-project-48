@@ -13,26 +13,26 @@ function formatToString(array $tree): string
 }
 function getPlainDiff(array $tree, array $path = []): array
 {
-    $result = [];
-    foreach ($tree as $name => $node) {
+    return array_reduce(array_keys($tree), function ($acc, $name) use ($tree, $path) {
+        $node = $tree[$name];
         if (isset($node['children'])) {
-            $result = array_merge($result, getPlainDiff($node['children'], [...$path, $name]));
+            $acc = array_merge($acc, getPlainDiff($node['children'], [...$path, $name]));
         } else {
             $value1 = array_key_exists('value-', $node) ? toString($node['value-']) : null;
             $value2 = array_key_exists('value+', $node) ? toString($node['value+']) : null;
-            $pathStr = implode('.', array_merge($path, [$name]));
+            $pathStr = implode('.', [...$path, $name]);
             if (isset($value1) && !isset($value2)) {
-                $result[] = sprintf(REMOVED, $pathStr);
+                $acc[] = sprintf(REMOVED, $pathStr);
             }
             if (isset($value1) && isset($value2)) {
-                $result[] = sprintf(UPDATED, $pathStr, $value1, $value2);
+                $acc[] = sprintf(UPDATED, $pathStr, $value1, $value2);
             }
             if (!isset($value1) && isset($value2)) {
-                $result[] = sprintf(ADDED, $pathStr, $value2);
+                $acc[] = sprintf(ADDED, $pathStr, $value2);
             }
         }
-    }
-    return $result;
+        return $acc;
+    }, []);
 }
 
 function toString(mixed $value): string

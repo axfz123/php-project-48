@@ -4,23 +4,25 @@ namespace Differ\Formatters\Stylish;
 
 function formatToString(array $tree, int $depth = 1): string
 {
-    $result = [];
-    foreach ($tree as $name => $node) {
+    $result = array_reduce(array_keys($tree), function ($acc, $name) use ($tree, $depth) {
+        $node = $tree[$name];
         if (isset($node['children'])) {
             $value = formatToString($node['children'], $depth + 1);
-            $result[] = formatValue($name, $value, $depth, ' ');
+            $acc[] = formatValue($name, $value, $depth, ' ');
         } else {
             if (array_key_exists('value', $node)) {
-                $result[] = formatValue($name, $node['value'], $depth, ' ');
+                $acc[] = formatValue($name, $node['value'], $depth, ' ');
             }
             if (array_key_exists('value-', $node)) {
-                $result[] = formatValue($name, $node['value-'], $depth, '-');
+                $acc[] = formatValue($name, $node['value-'], $depth, '-');
             }
             if (array_key_exists('value+', $node)) {
-                $result[] = formatValue($name, $node['value+'], $depth, '+');
+                $acc[] = formatValue($name, $node['value+'], $depth, '+');
             }
         }
-    }
+        return $acc;
+    }, []);
+
     $result[] = str_repeat(' ', ($depth - 1) * 4) . "}";
     return "{" . PHP_EOL . implode(PHP_EOL, $result);
 }
