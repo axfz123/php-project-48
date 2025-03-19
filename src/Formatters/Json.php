@@ -4,5 +4,9 @@ namespace Differ\Formatters\Json;
 
 function formatToString(array $tree): string
 {
-    return json_encode($tree, JSON_PRETTY_PRINT);
+    $str = json_encode($tree, JSON_PRETTY_PRINT);
+    if ($str === false) {
+        throw new \Exception("Failed to encode JSON");
+    }
+    return $str;
 }

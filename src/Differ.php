@@ -7,21 +7,18 @@ use function Differ\Formatters\formatDiff;
 
 function genDiff(string $filePath1, string $filePath2, string $formatName = "stylish"): string
 {
-    $realPath1 = realpath($filePath1);
-    $realPath2 = realpath($filePath2);
+    $ext1 = pathinfo($filePath1, PATHINFO_EXTENSION);
+    $ext2 = pathinfo($filePath2, PATHINFO_EXTENSION);
 
-    $ext1 = pathinfo($realPath1, PATHINFO_EXTENSION);
-    $ext2 = pathinfo($realPath2, PATHINFO_EXTENSION);
-
-    $tree1 = parseContent(getFileContents($realPath1), $ext1);
-    $tree2 = parseContent(getFileContents($realPath2), $ext2);
+    $tree1 = parseContent(getFileContents($filePath1), $ext1);
+    $tree2 = parseContent(getFileContents($filePath2), $ext2);
 
     $diff = compareArrays($tree1, $tree2);
 
     return formatDiff($diff, $formatName);
 }
 
-function compareArrays($array1, $array2)
+function compareArrays(array $array1, array $array2): array
 {
     $allKeys = array_unique(
         array_merge(
@@ -53,10 +50,17 @@ function compareArrays($array1, $array2)
     }, []);
 }
 
-function getFileContents($filePath): string
+function getFileContents(string $filePath): string
 {
     if (!file_exists($filePath)) {
         throw new \Exception("File \"{$filePath}\" not found");
     }
-    return file_get_contents($filePath);
+
+    $contents = file_get_contents($filePath);
+
+    if ($contents === false) {
+        throw new \Exception("File \"{$filePath}\" is empty");
+    }
+
+    return $contents;
 }
