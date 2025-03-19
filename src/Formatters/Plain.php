@@ -41,6 +41,7 @@ function toString(mixed $value): string
         $value === null => 'null',
         $value === true => 'true',
         $value === false => 'false',
+        is_numeric($value) => strval($value),
         is_array($value) => COMPLEX_VALUE,
         default => "'" . trim(var_export($value, true), "'") . "'",
     };
