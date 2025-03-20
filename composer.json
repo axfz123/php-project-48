@@ -3,6 +3,9 @@
     "type": "project",
     "license": "MIT",
     "description": "Difference Finder",
+    "bin": [
+        "bin/gendiff"
+    ],
     "autoload": {
         "files": [
             "src/Differ.php",
