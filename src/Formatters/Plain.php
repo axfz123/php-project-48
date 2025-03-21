@@ -11,6 +11,7 @@ function formatToString(array $tree): string
 {
     return implode(PHP_EOL, getPlainDiff($tree));
 }
+
 function getPlainDiff(array $tree, array $path = []): array
 {
     return array_reduce(array_keys($tree), function ($acc, $name) use ($tree, $path) {

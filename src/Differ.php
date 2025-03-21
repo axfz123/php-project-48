@@ -36,20 +36,19 @@ function compareArrays(array $array1, array $array2): array
         $value1 = $key1Exists ? $array1[$key] : null;
         $value2 = $key2Exists ? $array2[$key] : null;
 
-        $acc = [...$acc, $key => []];
+        $res = $acc;
+        $res[$key] = [];
         if ($value1 === $value2 && $key1Exists && $key2Exists) {
-            $acc[$key] = [...$acc[$key], 'value' => $value1];
-            //$acc[$key]['value'] = $value1;
+            $res[$key]['value'] = $value1;
         } else {
             if (is_array($value1) && is_array($value2)) {
-                $acc[$key] = [...$acc[$key], 'children' => compareArrays($value1, $value2)];
-                //$acc[$key]['children'] = compareArrays($value1, $value2);
+                $res[$key]['children'] = compareArrays($value1, $value2);
             } else {
-                $key1Exists ? $acc[$key]['value-'] = $value1 : null;
-                $key2Exists ? $acc[$key]['value+'] = $value2 : null;
+                $key1Exists ? $res[$key]['value-'] = $value1 : null;
+                $key2Exists ? $res[$key]['value+'] = $value2 : null;
             }
         }
-        return $acc;
+        return $res;
     }, []);
 }
 

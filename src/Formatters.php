@@ -12,6 +12,6 @@ function formatDiff(array $diff, string $formatName): string
         "stylish" => Stylish\formatToString($diff),
         "plain" => Plain\formatToString($diff),
         "json" => Json\formatToString($diff),
-        default => throw new \Exception("Unsupported formatter '{$formatName}'"),
+        default => throw new \Exception("Unsupported format '{$formatName}'"),
     };
 }
