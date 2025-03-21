@@ -64,6 +64,8 @@ function arrayToString(array $array, int $depth): string
 
 function toString(mixed $value): string
 {
-    $value = $value === null ? 'null' : $value;
-    return trim(var_export($value, true), "'");
+    return match ($value) {
+        null => 'null',
+        default => trim(var_export($value, true), "'"),
+    };
 }
