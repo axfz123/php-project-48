@@ -2,6 +2,7 @@
 
 namespace Differ\Differ;
 
+use function Functional\sort;
 use function Differ\Parsers\parseContent;
 use function Differ\Formatters\formatDiff;
 
@@ -26,7 +27,7 @@ function compareArrays(array $array1, array $array2): array
             array_keys($array2)
         )
     );
-    sort($allKeys);
+    $allKeys = sort($allKeys, fn($a, $b) => strcmp($a, $b));
 
     return array_reduce($allKeys, function ($acc, $key) use ($array1, $array2) {
         $key1Exists = array_key_exists($key, $array1);
@@ -35,12 +36,14 @@ function compareArrays(array $array1, array $array2): array
         $value1 = $key1Exists ? $array1[$key] : null;
         $value2 = $key2Exists ? $array2[$key] : null;
 
-        $acc[$key] = [];
+        $acc = [...$acc, $key => []];
         if ($value1 === $value2 && $key1Exists && $key2Exists) {
-            $acc[$key]['value'] = $value1;
+            $acc[$key] = [...$acc[$key], 'value' => $value1];
+            //$acc[$key]['value'] = $value1;
         } else {
             if (is_array($value1) && is_array($value2)) {
-                $acc[$key]['children'] = compareArrays($value1, $value2);
+                $acc[$key] = [...$acc[$key], 'children' => compareArrays($value1, $value2)];
+                //$acc[$key]['children'] = compareArrays($value1, $value2);
             } else {
                 $key1Exists ? $acc[$key]['value-'] = $value1 : null;
                 $key2Exists ? $acc[$key]['value+'] = $value2 : null;
