@@ -4,27 +4,37 @@ namespace Differ\Formatters\Stylish;
 
 function formatToString(array $tree, int $depth = 1): string
 {
-    $result = array_reduce(array_keys($tree), function ($acc, $name) use ($tree, $depth) {
-        $node = $tree[$name];
-        if (isset($node['children'])) {
-            $value = formatToString($node['children'], $depth + 1);
-            $acc[] = formatValue($name, $value, $depth, ' ');
-        } else {
-            if (array_key_exists('value', $node)) {
-                $acc[] = formatValue($name, $node['value'], $depth, ' ');
-            }
-            if (array_key_exists('value-', $node)) {
-                $acc[] = formatValue($name, $node['value-'], $depth, '-');
-            }
-            if (array_key_exists('value+', $node)) {
-                $acc[] = formatValue($name, $node['value+'], $depth, '+');
-            }
-        }
-        return $acc;
+    $items = array_reduce($tree, function ($acc, $node) use ($depth) {
+        $name = $node['name'];
+        $result = match ($node['type']) {
+            'nested' => [
+                formatValue($name, formatToString($node['children'], $depth + 1), $depth, ' ')
+            ],
+            'unchanged' => [
+                formatValue($name, $node['value1'], $depth, ' ')
+            ],
+            'removed' => [
+                formatValue($name, $node['value1'], $depth, '-')
+            ],
+            'added' => [
+                formatValue($name, $node['value2'], $depth, '+')
+            ],
+            default => [ // changed
+                formatValue($name, $node['value1'], $depth, '-'),
+                formatValue($name, $node['value2'], $depth, '+'),
+            ],
+        };
+        return array_merge($acc, $result);
     }, []);
 
-    $result[] = str_repeat(' ', ($depth - 1) * 4) . "}";
-    return "{" . PHP_EOL . implode(PHP_EOL, $result);
+    $lastIndent = str_repeat(' ', ($depth - 1) * 4);
+    $result = [
+        "{",
+        ...$items,
+        "{$lastIndent}}",
+    ];
+
+    return implode(PHP_EOL, $result);
 }
 
 function formatValue(string $name, mixed $value, int $depth, string $diff): string
@@ -37,12 +47,19 @@ function formatValue(string $name, mixed $value, int $depth, string $diff): stri
 function arrayToString(array $array, int $depth): string
 {
     $indent = str_repeat(' ', $depth * 4);
-    $result = array_map(function ($key, $value) use ($depth, $indent) {
+    $items = array_map(function ($key, $value) use ($depth, $indent) {
         $valueStr = is_array($value) ? arrayToString($value, $depth + 1) : toString($value);
         return  "{$indent}{$key}: {$valueStr}";
     }, array_keys($array), $array);
-    $result[] = str_repeat(' ', ($depth - 1) * 4) . "}";
-    return "{" . PHP_EOL . implode(PHP_EOL, $result);
+
+    $lastIndent = str_repeat(' ', ($depth - 1) * 4);
+    $result = [
+        "{",
+        ...$items,
+        "{$lastIndent}}",
+    ];
+
+    return implode(PHP_EOL, $result);
 }
 
 function toString(mixed $value): string

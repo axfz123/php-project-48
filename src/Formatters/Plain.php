@@ -14,25 +14,18 @@ function formatToString(array $tree): string
 
 function getPlainDiff(array $tree, array $path = []): array
 {
-    return array_reduce(array_keys($tree), function ($acc, $name) use ($tree, $path) {
-        $node = $tree[$name];
-        if (isset($node['children'])) {
-            $acc = array_merge($acc, getPlainDiff($node['children'], [...$path, $name]));
-        } else {
-            $value1 = array_key_exists('value-', $node) ? toString($node['value-']) : null;
-            $value2 = array_key_exists('value+', $node) ? toString($node['value+']) : null;
-            $pathStr = implode('.', [...$path, $name]);
-            if (isset($value1) && !isset($value2)) {
-                $acc[] = sprintf(REMOVED, $pathStr);
-            }
-            if (isset($value1) && isset($value2)) {
-                $acc[] = sprintf(UPDATED, $pathStr, $value1, $value2);
-            }
-            if (!isset($value1) && isset($value2)) {
-                $acc[] = sprintf(ADDED, $pathStr, $value2);
-            }
-        }
-        return $acc;
+    return array_reduce($tree, function ($acc, $node) use ($path) {
+        $name = $node['name'];
+        $currentPath = [...$path, $name];
+        $pathStr = implode(".", $currentPath);
+        $result = match ($node['type']) {
+            'nested' => getPlainDiff($node['children'], $currentPath),
+            'removed' => [sprintf(REMOVED, $pathStr)],
+            'added' => [sprintf(ADDED, $pathStr, toString($node['value2']))],
+            'changed' => [sprintf(UPDATED, $pathStr, toString($node['value1']), toString($node['value2']))],
+            default => [],
+        };
+        return array_merge($acc, $result);
     }, []);
 }
 

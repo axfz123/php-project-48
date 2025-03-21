@@ -16,6 +16,8 @@ function genDiff(string $filePath1, string $filePath2, string $formatName = "sty
 
     $diff = compareArrays($tree1, $tree2);
 
+    //echo formatDiff($diff, "json"); die;
+
     return formatDiff($diff, $formatName);
 }
 
@@ -29,26 +31,31 @@ function compareArrays(array $array1, array $array2): array
     );
     $sortedAllKeys = sort($allKeys, fn($a, $b) => strcmp($a, $b));
 
-    return array_reduce($sortedAllKeys, function ($acc, $key) use ($array1, $array2) {
+    return array_map(function ($key) use ($array1, $array2) {
         $key1Exists = array_key_exists($key, $array1);
         $key2Exists = array_key_exists($key, $array2);
 
         $value1 = $key1Exists ? $array1[$key] : null;
         $value2 = $key2Exists ? $array2[$key] : null;
 
-        $res = [...$acc, $key => []];
-        if ($value1 === $value2 && $key1Exists && $key2Exists) {
-            $res[$key] = [...$res[$key], 'value' => $value1];
-        } else {
-            if (is_array($value1) && is_array($value2)) {
-                $res[$key]['children'] = compareArrays($value1, $value2);
-            } else {
-                $key1Exists ? $res[$key]['value-'] = $value1 : null;
-                $key2Exists ? $res[$key]['value+'] = $value2 : null;
-            }
-        }
-        return $res;
-    }, []);
+        $type = match (true) {
+            $value1 === $value2 && $key1Exists && $key2Exists => 'unchanged',
+            is_array($value1) && is_array($value2) => 'nested',
+            !$key1Exists => 'added',
+            !$key2Exists => 'removed',
+            default => 'changed',
+        };
+
+        $children = $type === 'nested' ? compareArrays($value1, $value2) : null;
+
+        return [
+            'name' => $key,
+            'type' => $type,
+            'value1' => $value1,
+            'value2' => $value2,
+            'children' => $children
+        ];
+    }, $sortedAllKeys);
 }
 
 function getFileContents(string $filePath): string
