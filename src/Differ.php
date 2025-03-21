@@ -27,9 +27,9 @@ function compareArrays(array $array1, array $array2): array
             array_keys($array2)
         )
     );
-    $allKeys = sort($allKeys, fn($a, $b) => strcmp($a, $b));
+    $sortedAllKeys = sort($allKeys, fn($a, $b) => strcmp($a, $b));
 
-    return array_reduce($allKeys, function ($acc, $key) use ($array1, $array2) {
+    return array_reduce($sortedAllKeys, function ($acc, $key) use ($array1, $array2) {
         $key1Exists = array_key_exists($key, $array1);
         $key2Exists = array_key_exists($key, $array2);
 
@@ -38,7 +38,7 @@ function compareArrays(array $array1, array $array2): array
 
         $res = [...$acc, $key => []];
         if ($value1 === $value2 && $key1Exists && $key2Exists) {
-            $res[$key]['value'] = $value1;
+            $res[$key] = [...$res[$key], 'value' => $value1];
         } else {
             if (is_array($value1) && is_array($value2)) {
                 $res[$key]['children'] = compareArrays($value1, $value2);
