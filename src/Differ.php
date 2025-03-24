@@ -14,46 +14,65 @@ function genDiff(string $filePath1, string $filePath2, string $formatName = "sty
     $tree1 = parseContent(getFileContents($filePath1), $ext1);
     $tree2 = parseContent(getFileContents($filePath2), $ext2);
 
-    $diff = compareArrays($tree1, $tree2);
-
-    //echo formatDiff($diff, "json"); die;
+    $diff = compareTrees($tree1, $tree2);
 
     return formatDiff($diff, $formatName);
 }
 
-function compareArrays(array $array1, array $array2): array
+function compareTrees(array $tree1, array $tree2): array
 {
     $allKeys = array_unique(
         array_merge(
-            array_keys($array1),
-            array_keys($array2)
+            array_keys($tree1),
+            array_keys($tree2)
         )
     );
     $sortedAllKeys = sort($allKeys, fn($a, $b) => strcmp($a, $b));
 
-    return array_map(function ($key) use ($array1, $array2) {
-        $key1Exists = array_key_exists($key, $array1);
-        $key2Exists = array_key_exists($key, $array2);
+    return array_map(function ($key) use ($tree1, $tree2) {
+        $key1Exists = array_key_exists($key, $tree1);
+        $key2Exists = array_key_exists($key, $tree2);
 
-        $value1 = $key1Exists ? $array1[$key] : null;
-        $value2 = $key2Exists ? $array2[$key] : null;
+        $value1 = $key1Exists ? $tree1[$key] : null;
+        $value2 = $key2Exists ? $tree2[$key] : null;
 
-        $type = match (true) {
-            $value1 === $value2 && $key1Exists && $key2Exists => 'unchanged',
-            is_array($value1) && is_array($value2) => 'nested',
-            !$key1Exists => 'added',
-            !$key2Exists => 'removed',
-            default => 'changed',
-        };
+        if (is_array($value1) && is_array($value2)) {
+            return [
+                'name' => $key,
+                'type' => 'nested',
+                'children' => compareTrees($value1, $value2)
+            ];
+        }
 
-        $children = $type === 'nested' ? compareArrays($value1, $value2) : null;
+        if (!$key1Exists) {
+            return [
+                'name' => $key,
+                'type' => 'added',
+                'value2' => $value2
+            ];
+        }
+
+        if (!$key2Exists) {
+            return [
+                'name' => $key,
+                'type' => 'removed',
+                'value1' => $value1
+            ];
+        }
+
+        if ($value1 === $value2) {
+            return [
+                'name' => $key,
+                'type' => 'unchanged',
+                'value1' => $value1
+            ];
+        }
 
         return [
             'name' => $key,
-            'type' => $type,
+            'type' => 'changed',
             'value1' => $value1,
-            'value2' => $value2,
-            'children' => $children
+            'value2' => $value2
         ];
     }, $sortedAllKeys);
 }

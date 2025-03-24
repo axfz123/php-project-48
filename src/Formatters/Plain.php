@@ -2,30 +2,32 @@
 
 namespace Differ\Formatters\Plain;
 
-const REMOVED = "Property '%s' was removed";
-const UPDATED = "Property '%s' was updated. From %s to %s";
-const ADDED = "Property '%s' was added with value: %s";
-const COMPLEX_VALUE = "[complex value]";
+const STR_REMOVED = "Property '%s' was removed";
+const STR_UPDATED = "Property '%s' was updated. From %s to %s";
+const STR_ADDED = "Property '%s' was added with value: %s";
+const STR_COMPLEX_VALUE = "[complex value]";
 
 function formatToString(array $tree): string
 {
     return implode(PHP_EOL, getPlainDiff($tree));
 }
 
-function getPlainDiff(array $tree, array $path = []): array
+function getPlainDiff(array $tree, array $pathItems = []): array
 {
-    return array_reduce($tree, function ($acc, $node) use ($path) {
+    return array_reduce($tree, function ($acc, $node) use ($pathItems) {
         $name = $node['name'];
-        $currentPath = [...$path, $name];
-        $pathStr = implode(".", $currentPath);
+        $currentPathItems = [...$pathItems, $name];
+        $pathStr = implode(".", $currentPathItems);
+        if ($node['type'] === 'nested') {
+            return array_merge($acc, getPlainDiff($node['children'], $currentPathItems));
+        }
         $result = match ($node['type']) {
-            'nested' => getPlainDiff($node['children'], $currentPath),
-            'removed' => [sprintf(REMOVED, $pathStr)],
-            'added' => [sprintf(ADDED, $pathStr, toString($node['value2']))],
-            'changed' => [sprintf(UPDATED, $pathStr, toString($node['value1']), toString($node['value2']))],
-            default => [],
+            'removed' => sprintf(STR_REMOVED, $pathStr),
+            'added' => sprintf(STR_ADDED, $pathStr, toString($node['value2'])),
+            'changed' => sprintf(STR_UPDATED, $pathStr, toString($node['value1']), toString($node['value2'])),
+            default => null,
         };
-        return array_merge($acc, $result);
+        return isset($result) ? [...$acc, $result] : $acc;
     }, []);
 }
 
@@ -36,7 +38,7 @@ function toString(mixed $value): string
         $value === true => 'true',
         $value === false => 'false',
         is_numeric($value) => strval($value),
-        is_array($value) => COMPLEX_VALUE,
-        default => "'" . trim(var_export($value, true), "'") . "'",
+        is_array($value) => STR_COMPLEX_VALUE,
+        default => var_export($value, true),
     };
 }

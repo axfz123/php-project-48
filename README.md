@@ -3,6 +3,11 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/6b53761fb0d1ecdf669a/maintainability)](https://codeclimate.com/github/axfz123/php-project-48/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/6b53761fb0d1ecdf669a/test_coverage)](https://codeclimate.com/github/axfz123/php-project-48/test_coverage)
 
+## Requirements
+
+- PHP >= 8.0
+- Composer
+
 ## Setup
 
 ```

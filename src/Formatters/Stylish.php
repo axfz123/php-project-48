@@ -19,10 +19,11 @@ function formatToString(array $tree, int $depth = 1): string
             'added' => [
                 formatValue($name, $node['value2'], $depth, '+')
             ],
-            default => [ // changed
+            'changed' => [
                 formatValue($name, $node['value1'], $depth, '-'),
                 formatValue($name, $node['value2'], $depth, '+'),
             ],
+            default => [],
         };
         return array_merge($acc, $result);
     }, []);

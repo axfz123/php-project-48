@@ -3,51 +3,30 @@
 namespace Differ\Differ\Tests;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 use function Differ\Differ\genDiff;
 use function Differ\Differ\getFileContents;
 
 class DifferTest extends TestCase
 {
-    public function testDifferJsonFormatterStylish(): void
+    public static function additionProvider(): array
     {
-        $genDiffResult = genDiff('tests/fixtures/file1.json', 'tests/fixtures/file2.json', 'stylish');
-        $expected = getFileContents('tests/fixtures/expected-json.txt');
-        $this->assertEquals($expected, $genDiffResult);
+        return [
+            ['file1.json', 'file2.json', 'stylish', 'expected-json.txt'],
+            ['file1.json', 'file2.json', 'plain', 'plain.txt'],
+            ['file1.json', 'file2.json', 'json', 'json.txt'],
+            ['file1.yml', 'file2.yaml', 'stylish', 'expected-yaml.txt'],
+            ['file1.yml', 'file2.yaml', 'plain', 'plain.txt'],
+            ['file1.yml', 'file2.yaml', 'json', 'json.txt'],
+        ];
     }
 
-    public function testDifferJsonFormatterPlain(): void
+    #[DataProvider('additionProvider')]
+    public function testDiffer(string $file1, string $file2, string $formatName, string $expectedFile): void
     {
-        $genDiffResult = genDiff('tests/fixtures/file1.json', 'tests/fixtures/file2.json', 'plain');
-        $expected = getFileContents('tests/fixtures/plain.txt');
-        $this->assertEquals($expected, $genDiffResult);
-    }
-
-    public function testDifferJsonFormatterJson(): void
-    {
-        $genDiffResult = genDiff('tests/fixtures/file1.json', 'tests/fixtures/file2.json', 'json');
-        $expected = getFileContents('tests/fixtures/json.txt');
-        $this->assertEquals($expected, $genDiffResult);
-    }
-
-    public function testDifferYamlFormatterStylish(): void
-    {
-        $genDiffResult = genDiff('tests/fixtures/file1.yml', 'tests/fixtures/file2.yaml', 'stylish');
-        $expected = getFileContents('tests/fixtures/expected-yaml.txt');
-        $this->assertEquals($expected, $genDiffResult);
-    }
-
-    public function testDifferYamlFormatterPlain(): void
-    {
-        $genDiffResult = genDiff('tests/fixtures/file1.yml', 'tests/fixtures/file2.yaml', 'plain');
-        $expected = getFileContents('tests/fixtures/plain.txt');
-        $this->assertEquals($expected, $genDiffResult);
-    }
-
-    public function testDifferYamlFormatterJson(): void
-    {
-        $genDiffResult = genDiff('tests/fixtures/file1.yml', 'tests/fixtures/file2.yaml', 'json');
-        $expected = getFileContents('tests/fixtures/json.txt');
+        $genDiffResult = genDiff("tests/fixtures/{$file1}", "tests/fixtures/{$file2}", $formatName);
+        $expected = getFileContents("tests/fixtures/{$expectedFile}");
         $this->assertEquals($expected, $genDiffResult);
     }
 

@@ -9,7 +9,7 @@ function parseContent(string $content, string $ext): array
     return match ($ext) {
         'json' => parseJson($content),
         'yaml', 'yml' => parseYaml($content),
-        default => throw new \Exception("Unsupported file extension: \"{$ext}\"")
+        default => throw new \Exception("Unsupported file format: \"{$ext}\"")
     };
 }
 
