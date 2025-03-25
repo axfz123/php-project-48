@@ -26,10 +26,10 @@ Options:
   --format <fmt>                Report format [default: stylish]
 DOC;
 
-$handler = new \Docopt\Handler(array(
+$handler = new \Docopt\Handler([
     'help' => true,
     'optionsFirst' => false,
-));
+]);
 $args = $handler->handle($doc);
 
 $formatName = $args->args["--format"] ?? "stylish";

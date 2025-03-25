@@ -4,7 +4,7 @@ namespace Differ\Formatters\Stylish;
 
 function formatToString(array $tree, int $depth = 1): string
 {
-    $items = array_reduce($tree, function ($acc, $node) use ($depth) {
+    $items = array_reduce($tree, function (array $acc, array $node) use ($depth): array {
         $name = $node['name'];
         $result = match ($node['type']) {
             'nested' => [
@@ -23,7 +23,7 @@ function formatToString(array $tree, int $depth = 1): string
                 formatValue($name, $node['value1'], $depth, '-'),
                 formatValue($name, $node['value2'], $depth, '+'),
             ],
-            default => [],
+            default => throw new \Exception("Unsupported node type '{$node['type']}'"),
         };
         return array_merge($acc, $result);
     }, []);
@@ -48,7 +48,7 @@ function formatValue(string $name, mixed $value, int $depth, string $diff): stri
 function arrayToString(array $array, int $depth): string
 {
     $indent = str_repeat(' ', $depth * 4);
-    $items = array_map(function ($key, $value) use ($depth, $indent) {
+    $items = array_map(function (string $key, mixed $value) use ($depth, $indent): string {
         $valueStr = is_array($value) ? arrayToString($value, $depth + 1) : toString($value);
         return  "{$indent}{$key}: {$valueStr}";
     }, array_keys($array), $array);

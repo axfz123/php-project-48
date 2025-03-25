@@ -4,18 +4,22 @@ namespace Differ\Parsers;
 
 use Symfony\Component\Yaml\Yaml;
 
-function parseContent(string $content, string $ext): array
+function parseContent(string $content, string $format): array
 {
-    return match ($ext) {
+    return match ($format) {
         'json' => parseJson($content),
         'yaml', 'yml' => parseYaml($content),
-        default => throw new \Exception("Unsupported file format: \"{$ext}\"")
+        default => throw new \Exception("Unsupported format: \"{$format}\"")
     };
 }
 
 function parseJson(string $jsonString): array
 {
-    return json_decode($jsonString, true) ?? [];
+    return json_decode(
+        json: $jsonString,
+        associative: true,
+        flags: JSON_THROW_ON_ERROR
+    );
 }
 
 function parseYaml(string $yamlString): array

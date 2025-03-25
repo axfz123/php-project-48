@@ -29,7 +29,7 @@ function compareTrees(array $tree1, array $tree2): array
     );
     $sortedAllKeys = sort($allKeys, fn($a, $b) => strcmp($a, $b));
 
-    return array_map(function ($key) use ($tree1, $tree2) {
+    return array_map(function (string $key) use ($tree1, $tree2): array {
         $key1Exists = array_key_exists($key, $tree1);
         $key2Exists = array_key_exists($key, $tree2);
 

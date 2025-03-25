@@ -7,6 +7,7 @@
 
 - PHP >= 8.0
 - Composer
+- Make
 
 ## Setup
 

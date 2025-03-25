@@ -14,20 +14,35 @@ function formatToString(array $tree): string
 
 function getPlainDiff(array $tree, array $pathItems = []): array
 {
-    return array_reduce($tree, function ($acc, $node) use ($pathItems) {
+    return array_reduce($tree, function (array $acc, array $node) use ($pathItems): array {
         $name = $node['name'];
         $currentPathItems = [...$pathItems, $name];
         $pathStr = implode(".", $currentPathItems);
+        if ($node['type'] === 'unchanged') {
+            return $acc;
+        }
         if ($node['type'] === 'nested') {
             return array_merge($acc, getPlainDiff($node['children'], $currentPathItems));
         }
-        $result = match ($node['type']) {
-            'removed' => sprintf(STR_REMOVED, $pathStr),
-            'added' => sprintf(STR_ADDED, $pathStr, toString($node['value2'])),
-            'changed' => sprintf(STR_UPDATED, $pathStr, toString($node['value1']), toString($node['value2'])),
-            default => null,
-        };
-        return isset($result) ? [...$acc, $result] : $acc;
+        if ($node['type'] === 'changed') {
+            return [
+                ...$acc,
+                sprintf(STR_UPDATED, $pathStr, toString($node['value1']), toString($node['value2']))
+            ];
+        }
+        if ($node['type'] === 'added') {
+            return [
+                ...$acc,
+                sprintf(STR_ADDED, $pathStr, toString($node['value2']))
+            ];
+        }
+        if ($node['type'] === 'removed') {
+            return [
+                ...$acc,
+                sprintf(STR_REMOVED, $pathStr)
+            ];
+        }
+        return $acc;
     }, []);
 }
 
