@@ -13,16 +13,16 @@ function parseContent(string $content, string $format): array
     };
 }
 
-function parseJson(string $jsonString): array
+function parseJson(string $str): array
 {
     return json_decode(
-        json: $jsonString,
+        json: $str,
         associative: true,
         flags: JSON_THROW_ON_ERROR
     );
 }
 
-function parseYaml(string $yamlString): array
+function parseYaml(string $str): array
 {
-    return Yaml::parse($yamlString) ?? [];
+    return Yaml::parse($str, Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE);
 }

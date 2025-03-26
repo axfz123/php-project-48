@@ -18,31 +18,26 @@ function getPlainDiff(array $tree, array $pathItems = []): array
         $name = $node['name'];
         $currentPathItems = [...$pathItems, $name];
         $pathStr = implode(".", $currentPathItems);
-        if ($node['type'] === 'unchanged') {
-            return $acc;
-        }
-        if ($node['type'] === 'nested') {
-            return array_merge($acc, getPlainDiff($node['children'], $currentPathItems));
-        }
-        if ($node['type'] === 'changed') {
-            return [
+        return match ($node['type']) {
+            'nested' => [
                 ...$acc,
-                sprintf(STR_UPDATED, $pathStr, toString($node['value1']), toString($node['value2']))
-            ];
-        }
-        if ($node['type'] === 'added') {
-            return [
+                ...getPlainDiff($node['children'], $currentPathItems)
+            ],
+            'added' => [
                 ...$acc,
                 sprintf(STR_ADDED, $pathStr, toString($node['value2']))
-            ];
-        }
-        if ($node['type'] === 'removed') {
-            return [
+            ],
+            'removed' => [
                 ...$acc,
                 sprintf(STR_REMOVED, $pathStr)
-            ];
-        }
-        return $acc;
+            ],
+            'changed' => [
+                ...$acc,
+                sprintf(STR_UPDATED, $pathStr, toString($node['value1']), toString($node['value2']))
+            ],
+            'unchanged' => $acc,
+            default => throw new \Exception("Unsupported node type '{$node['type']}'"),
+        };
     }, []);
 }
 
